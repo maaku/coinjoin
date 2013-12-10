@@ -96,7 +96,7 @@ dist:
 
 ${CACHE}/virtualenv/virtualenv-1.10.tar.gz:
 	mkdir -p "${CACHE}"/virtualenv
-	curl -L 'https://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.10.tar.gz' >'$@'
+	curl -L 'https://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.10.tar.gz' >'$@' || { rm -f '$@'; exit 1; }
 
 .PHONY:
 python-env: ${PYENV}/.stamp-h
@@ -135,7 +135,7 @@ ${PYENV}/.stamp-h: ${ROOT}/requirements.txt ${CONF}/requirements*.txt ${CACHE}/v
 	    CFLAGS=-I/opt/local/include LDFLAGS=-L/opt/local/lib \
 	    "${PYENV}"/bin/python "${PYENV}"/bin/pip install \
 	        --download-cache="${CACHE}"/pypi \
-	        -r "$$reqfile"; \
+	        -r "$$reqfile" || exit 1; \
 	done
 	
 	# All done!
