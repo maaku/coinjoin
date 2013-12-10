@@ -98,13 +98,9 @@ ${CACHE}/virtualenv/virtualenv-1.10.tar.gz:
 	mkdir -p "${CACHE}"/virtualenv
 	curl -L 'https://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.10.tar.gz' >'$@' || { rm -f '$@'; exit 1; }
 
-.PHONY:
-python-env: ${PYENV}/.stamp-h
-
-${PYENV}/.stamp-h: ${ROOT}/requirements.txt ${CONF}/requirements*.txt ${CACHE}/virtualenv/virtualenv-1.10.tar.gz
+${CACHE}/pyenv-1.10-base.tar.gz: ${CACHE}/virtualenv/virtualenv-1.10.tar.gz
 	-rm -rf "${PYENV}"
 	mkdir -p "${PYENV}"
-	mkdir -p "${CACHE}"/pypi
 	
 	# virtualenv is used to create a separate Python installation
 	# for this project in ${PYENV}.
@@ -118,6 +114,19 @@ ${PYENV}/.stamp-h: ${ROOT}/requirements.txt ${CONF}/requirements*.txt ${CACHE}/v
 	    --prompt="(${APP_NAME}) " \
 	    "${PYENV}"
 	-rm -rf "${CACHE}"/virtualenv/virtualenv-1.10
+	
+	# Snapshot the Python environment
+	tar -C "${PYENV}" --gzip -cf "$@" .
+	rm -rf "${PYENV}"
+
+${CACHE}/pyenv-1.10-extras.tar.gz: ${CACHE}/pyenv-1.10-base.tar.gz ${ROOT}/requirements.txt ${CONF}/requirements*.txt
+	-rm -rf "${PYENV}"
+	mkdir -p "${PYENV}"
+	mkdir -p "${CACHE}"/pypi
+	
+	# Uncompress saved Python environment
+	tar -C "${PYENV}" --gzip -xf "${CACHE}"/pyenv-1.10-base.tar.gz
+	find "${PYENV}" -not -type d -print0 >"${ROOT}"/.pkglist
 	
 	# readline is installed here to get around a bug on Mac OS X
 	# which is causing readline to not build properly if installed
@@ -137,6 +146,22 @@ ${PYENV}/.stamp-h: ${ROOT}/requirements.txt ${CONF}/requirements*.txt ${CACHE}/v
 	        --download-cache="${CACHE}"/pypi \
 	        -r "$$reqfile" || exit 1; \
 	done
+	
+	# Snapshot the Python environment
+	cat "${ROOT}"/.pkglist | xargs -0 rm -rf
+	tar -C "${PYENV}" --gzip -cf "$@" .
+	rm -rf "${PYENV}" "${ROOT}"/.pkglist
+
+.PHONY:
+python-env: ${PYENV}/.stamp-h
+
+${PYENV}/.stamp-h: ${CACHE}/pyenv-1.10-base.tar.gz ${CACHE}/pyenv-1.10-extras.tar.gz
+	-rm -rf "${PYENV}"
+	mkdir -p "${PYENV}"
+	
+	# Uncompress saved Python environment
+	tar -C "${PYENV}" --gzip -xf "${CACHE}"/pyenv-1.10-base.tar.gz
+	tar -C "${PYENV}" --gzip -xf "${CACHE}"/pyenv-1.10-extras.tar.gz
 	
 	# All done!
 	touch "$@"
