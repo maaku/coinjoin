@@ -1,9 +1,9 @@
 .*.swp
 *.pyc
-/Makefile.local
+Makefile.local
 /.cache/
 /.pyenv/
-/build/
+build/
 /.coverage
 MANIFEST
 dist/*
