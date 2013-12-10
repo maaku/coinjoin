@@ -9,3 +9,4 @@ build/
 /.coverage
 MANIFEST
 dist/*
+coinjoin.sqlite
