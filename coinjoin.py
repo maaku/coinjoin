@@ -1,12 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-#
 # Copyright © 2013 by its contributors. See AUTHORS for details.
-#
 # Distributed under the MIT/X11 software license, see the accompanying
 # file LICENSE or http://www.opensource.org/licenses/mit-license.php.
-#
 
 from base64 import standard_b64encode, standard_b64decode
 import calendar
@@ -188,6 +184,8 @@ def test_oaep():
 # SQLAlchemy object-relational mapper
 from sqlalchemy import *
 
+# ===----------------------------------------------------------------------===
+
 class LittleEndian(TypeDecorator):
     impl = LargeBinary
 
@@ -302,6 +300,8 @@ class BlockTime(TypeDecorator):
     def copy(self):
         return self.__class__(self.impl.timezone)
 
+# ===----------------------------------------------------------------------===
+
 # SQLAlchemy ORM event registration
 from sqlalchemy import event, orm
 
@@ -317,6 +317,8 @@ def lazy_defaults(session, flush_context, instances):
             # passing the field values to the database layer.
             for attr in target.__lazy_slots__:
                 getattr(target, attr)
+
+# ===----------------------------------------------------------------------===
 
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declarative_base
@@ -971,7 +973,3 @@ if __name__ == '__main__':
 
     import IPython
     IPython.embed()
-
-#
-# End of File
-#

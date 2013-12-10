@@ -1,9 +1,6 @@
-#
 # Copyright © 2013 by its contributors. See AUTHORS for details.
-#
 # Distributed under the MIT/X11 software license, see the accompanying
 # file LICENSE or http://www.opensource.org/licenses/mit-license.php.
-#
 
 ROOT=$(shell pwd)
 CACHE_ROOT=${ROOT}/.cache
@@ -153,7 +150,3 @@ ${PYENV}/.stamp-h: ${ROOT}/requirements.txt ${CONF}/requirements*.txt ${CACHE_RO
 	
 	# All done!
 	touch "${PYENV}"/.stamp-h
-
-#
-# End of File
-#

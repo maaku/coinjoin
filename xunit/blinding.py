@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
-
-#
 # Copyright © 2013 by its contributors. See AUTHORS for details.
-#
 # Distributed under the MIT/X11 software license, see the accompanying
 # file LICENSE or http://www.opensource.org/licenses/mit-license.php.
-#
 
 from unittest2 import TestCase
 
@@ -25,7 +21,3 @@ class TestBlinding(TestCase):
             signature = unblind_signature(signing_key, blinding_factor, blinded_signature)
             self.assertTrue(verify_signed_message(verifying_key, signature, message))
             self.assertFalse(verify_signed_message(verifying_key, signature, message+1))
-
-#
-# End of File
-#
