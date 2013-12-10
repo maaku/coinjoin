@@ -2,7 +2,9 @@
 *.pyc
 Makefile.local
 /.cache/
+/.pkglist
 /.pyenv/
+/.sysroot/
 build/
 /.coverage
 MANIFEST
