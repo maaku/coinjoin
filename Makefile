@@ -96,11 +96,11 @@ dist:
 
 # ===--------------------------------------------------------------------===
 
-${CACHE}/virtualenv/virtualenv-1.10.tar.gz:
+${CACHE}/virtualenv/virtualenv-1.10.1.tar.gz:
 	mkdir -p "${CACHE}"/virtualenv
-	curl -L 'https://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.10.tar.gz' >'$@' || { rm -f '$@'; exit 1; }
+	curl -L 'https://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.10.1.tar.gz' >'$@' || { rm -f '$@'; exit 1; }
 
-${CACHE}/pyenv-1.10-base.tar.gz: ${CACHE}/virtualenv/virtualenv-1.10.tar.gz
+${CACHE}/pyenv-1.10.1-base.tar.gz: ${CACHE}/virtualenv/virtualenv-1.10.1.tar.gz
 	-rm -rf "${PYENV}"
 	mkdir -p "${PYENV}"
 	
@@ -108,26 +108,26 @@ ${CACHE}/pyenv-1.10-base.tar.gz: ${CACHE}/virtualenv/virtualenv-1.10.tar.gz
 	# for this project in ${PYENV}.
 	tar \
 	    -C "${CACHE}"/virtualenv --gzip \
-	    -xf "${CACHE}"/virtualenv/virtualenv-1.10.tar.gz
-	python "${CACHE}"/virtualenv/virtualenv-1.10/virtualenv.py \
+	    -xf "${CACHE}"/virtualenv/virtualenv-1.10.1.tar.gz
+	python "${CACHE}"/virtualenv/virtualenv-1.10.1/virtualenv.py \
 	    --clear \
 	    --distribute \
 	    --never-download \
 	    --prompt="(${APP_NAME}) " \
 	    "${PYENV}"
-	-rm -rf "${CACHE}"/virtualenv/virtualenv-1.10
+	-rm -rf "${CACHE}"/virtualenv/virtualenv-1.10.1
 	
 	# Snapshot the Python environment
 	tar -C "${PYENV}" --gzip -cf "$@" .
 	rm -rf "${PYENV}"
 
-${CACHE}/pyenv-1.10-extras.tar.gz: ${CACHE}/pyenv-1.10-base.tar.gz ${ROOT}/requirements.txt ${CONF}/requirements*.txt ${SYSROOT}/.stamp-gmp-h ${SYSROOT}/.stamp-mpfr-h ${SYSROOT}/.stamp-mpc-h
+${CACHE}/pyenv-1.10.1-extras.tar.gz: ${CACHE}/pyenv-1.10.1-base.tar.gz ${ROOT}/requirements.txt ${CONF}/requirements*.txt ${SYSROOT}/.stamp-gmp-h ${SYSROOT}/.stamp-mpfr-h ${SYSROOT}/.stamp-mpc-h
 	-rm -rf "${PYENV}"
 	mkdir -p "${PYENV}"
 	mkdir -p "${CACHE}"/pypi
 	
 	# Uncompress saved Python environment
-	tar -C "${PYENV}" --gzip -xf "${CACHE}"/pyenv-1.10-base.tar.gz
+	tar -C "${PYENV}" --gzip -xf "${CACHE}"/pyenv-1.10.1-base.tar.gz
 	find "${PYENV}" -not -type d -print0 >"${ROOT}"/.pkglist
 	
 	# readline is installed here to get around a bug on Mac OS X
@@ -158,13 +158,13 @@ ${CACHE}/pyenv-1.10-extras.tar.gz: ${CACHE}/pyenv-1.10-base.tar.gz ${ROOT}/requi
 .PHONY:
 python-env: ${PYENV}/.stamp-h
 
-${PYENV}/.stamp-h: ${CACHE}/pyenv-1.10-base.tar.gz ${CACHE}/pyenv-1.10-extras.tar.gz
+${PYENV}/.stamp-h: ${CACHE}/pyenv-1.10.1-base.tar.gz ${CACHE}/pyenv-1.10.1-extras.tar.gz
 	-rm -rf "${PYENV}"
 	mkdir -p "${PYENV}"
 	
 	# Uncompress saved Python environment
-	tar -C "${PYENV}" --gzip -xf "${CACHE}"/pyenv-1.10-base.tar.gz
-	tar -C "${PYENV}" --gzip -xf "${CACHE}"/pyenv-1.10-extras.tar.gz
+	tar -C "${PYENV}" --gzip -xf "${CACHE}"/pyenv-1.10.1-base.tar.gz
+	tar -C "${PYENV}" --gzip -xf "${CACHE}"/pyenv-1.10.1-extras.tar.gz
 	
 	# All done!
 	touch "$@"
