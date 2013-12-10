@@ -3,7 +3,7 @@
 # file LICENSE or http://www.opensource.org/licenses/mit-license.php.
 
 ROOT=$(shell pwd)
-CACHE_ROOT=${ROOT}/.cache
+CACHE=${ROOT}/.cache
 PYENV=${ROOT}/.pyenv
 CONF=${ROOT}/conf
 APP_NAME=coinjoin
@@ -12,7 +12,7 @@ PACKAGE=coinjoin
 -include Makefile.local
 
 .PHONY: all
-all: ${PYENV}/.stamp-h
+all: python-env
 
 .PHONY: check
 check: all
@@ -31,7 +31,7 @@ check: all
 	chmod +x .pytest.py
 	"${PYENV}"/bin/coverage run .pytest.py || { rm -f .pytest.py; exit 1; }
 	"${PYENV}"/bin/coverage xml --omit=".pytest.py" -o build/report/coverage.xml
-	rm -f .pytest.py
+	-rm -f .pytest.py
 
 .PHONY: debugcheck
 debugcheck: all
@@ -78,7 +78,7 @@ clean: mostlyclean
 
 .PHONY: distclean
 distclean: clean
-	-rm -rf "${CACHE_ROOT}"
+	-rm -rf "${CACHE}"
 	-rm -rf Makefile.local
 
 .PHONY: maintainer-clean
@@ -94,40 +94,30 @@ dist:
 
 # ===--------------------------------------------------------------------===
 
-${CACHE_ROOT}/virtualenv/virtualenv-1.10.tar.gz:
-	mkdir -p "${CACHE_ROOT}"/virtualenv
+${CACHE}/virtualenv/virtualenv-1.10.tar.gz:
+	mkdir -p "${CACHE}"/virtualenv
 	curl -L 'https://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.10.tar.gz' >'$@'
 
-${PYENV}/.stamp-h: ${ROOT}/requirements.txt ${CONF}/requirements*.txt ${CACHE_ROOT}/virtualenv/virtualenv-1.10.tar.gz
-	# Because build and run-time dependencies are not thoroughly tracked,
-	# it is entirely possible that rebuilding the development environment
-	# on top of an existing one could result in a broken build. For the
-	# sake of consistency and preventing unnecessary, difficult-to-debug
-	# problems, the entire development environment is rebuilt from scratch
-	# everytime this make target is selected.
-	${MAKE} clean
-	
-	# The ${PYENV} directory, if it exists, was removed above. The
-	# PyPI cache is nonexistant if this is a freshly checked-out
-	# repository, or if the `distclean` target has been run.  This
-	# might cause problems with build scripts executed later which
-	# assume their existence, so they are created now if they don't
-	# already exist.
+.PHONY:
+python-env: ${PYENV}/.stamp-h
+
+${PYENV}/.stamp-h: ${ROOT}/requirements.txt ${CONF}/requirements*.txt ${CACHE}/virtualenv/virtualenv-1.10.tar.gz
+	-rm -rf "${PYENV}"
 	mkdir -p "${PYENV}"
-	mkdir -p "${CACHE_ROOT}"/pypi
+	mkdir -p "${CACHE}"/pypi
 	
-	# `virtualenv` is used to create a separate Python installation for
-	# this project in `${PYENV}`.
+	# virtualenv is used to create a separate Python installation
+	# for this project in ${PYENV}.
 	tar \
-	    -C "${CACHE_ROOT}"/virtualenv --gzip \
-	    -xf "${CACHE_ROOT}"/virtualenv/virtualenv-1.10.tar.gz
-	python "${CACHE_ROOT}"/virtualenv/virtualenv-1.10/virtualenv.py \
+	    -C "${CACHE}"/virtualenv --gzip \
+	    -xf "${CACHE}"/virtualenv/virtualenv-1.10.tar.gz
+	python "${CACHE}"/virtualenv/virtualenv-1.10/virtualenv.py \
 	    --clear \
 	    --distribute \
 	    --never-download \
 	    --prompt="(${APP_NAME}) " \
 	    "${PYENV}"
-	-rm -rf "${CACHE_ROOT}"/virtualenv/virtualenv-1.10
+	-rm -rf "${CACHE}"/virtualenv/virtualenv-1.10
 	
 	# readline is installed here to get around a bug on Mac OS X
 	# which is causing readline to not build properly if installed
@@ -144,9 +134,9 @@ ${PYENV}/.stamp-h: ${ROOT}/requirements.txt ${CONF}/requirements*.txt ${CACHE_RO
 	               "${CONF}"/requirements*.txt; do \
 	    CFLAGS=-I/opt/local/include LDFLAGS=-L/opt/local/lib \
 	    "${PYENV}"/bin/python "${PYENV}"/bin/pip install \
-	        --download-cache="${CACHE_ROOT}"/pypi \
+	        --download-cache="${CACHE}"/pypi \
 	        -r "$$reqfile"; \
 	done
 	
 	# All done!
-	touch "${PYENV}"/.stamp-h
+	touch "$@"
