@@ -1,0 +1,9 @@
+.*.swp
+*.pyc
+/Makefile.local
+/.cache/
+/.pyenv/
+/build/
+/.coverage
+MANIFEST
+dist/*
